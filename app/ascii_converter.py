@@ -45,6 +45,12 @@ chars = [GRAYS[pixel * (n - 1) // 255] for pixel in pixels]
 #chars = [GRAYS[(255 - pixel) * (n - 1) // 255] for pixel in pixels]
 ascii_lines = ["".join(chars[i:i + cols]) for i in range(0, len(chars), cols)]
 
+# Записываем ascii картинку в текстовый файл
+filename_text = "ascii_output.txt"
+with open(filename_text, "w", encoding="utf8") as f:
+    for line in ascii_lines:
+        f.write(line + "\n")
+
 # Создаем новое изображение для ASCII-арта
 out_w = char_w * cols
 out_h = char_h * rows
