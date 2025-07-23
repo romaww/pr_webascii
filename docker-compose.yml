@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    ports:
+      #- "10.66.66.5:3000:5000"
+      - "3000:5000"
+    restart: unless-stopped
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    volumes:
+      - ./app:/app

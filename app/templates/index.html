@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to ASCII Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        .width-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .result-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 4px;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        #ascii-text {
+            background: #1a1a1a;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 8px;
+            line-height: 1;
+            padding: 20px;
+            border-radius: 10px;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        #ascii-image {
+            text-align: center;
+        }
+        
+        #ascii-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .copy-button {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            background: #28a745;
+        }
+        
+        .copy-button:hover {
+            background: #218838;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            #ascii-text {
+                font-size: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Image to ASCII Converter</h1>
+        
+        <div class="upload-section">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="imageInput">Choose an image:</label>
+                    <input type="file" id="imageInput" accept="image/*" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="widthSlider">ASCII Width:</label>
+                    <input type="range" id="widthSlider" min="20" max="150" value="80">
+                    <div class="width-display" id="widthDisplay">80 characters</div>
+                </div>
+                
+                <button type="submit" id="convertButton">Convert to ASCII</button>
+            </form>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Converting your image... Please wait
+        </div>
+        
+        <div class="results" id="results">
+            <div class="result-tabs">
+                <button class="tab-button active" onclick="switchTab('text')">ASCII Text</button>
+                <button class="tab-button" onclick="switchTab('image')">ASCII Image</button>
+            </div>
+            
+            <div class="tab-content active" id="text-tab">
+                <button class="copy-button" onclick="copyToClipboard()">📋 Copy ASCII Text</button>
+                <div id="ascii-text"></div>
+            </div>
+            
+            <div class="tab-content" id="image-tab">
+                <div id="ascii-image">
+                    <img id="asciiImageTag" src="" alt="ASCII Art">
+                    <a id="downloadLink" href="#" download="ascii_output.jpg" style="display: none; margin-top: 10px;">
+                        <button class="copy-button" style="background: #007bff;">⬇️ Download Image</button>
+                    </a>
+                    </div>
+
+            </div>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        const widthSlider = document.getElementById('widthSlider');
+        const widthDisplay = document.getElementById('widthDisplay');
+        const uploadForm = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const errorDiv = document.getElementById('error');
+        const convertButton = document.getElementById('convertButton');
+
+        // Обновление отображения ширины
+        widthSlider.addEventListener('input', function() {
+            widthDisplay.textContent = `${this.value} characters`;
+        });
+
+        // Обработка формы
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const imageFile = document.getElementById('imageInput').files[0];
+            if (!imageFile) {
+                showError('Please select an image file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            formData.append('width', widthSlider.value);
+            
+            // Показать загрузку
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            errorDiv.style.display = 'none';
+            convertButton.disabled = true;
+            
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Показать результаты
+                    document.getElementById('ascii-text').textContent = data.ascii_text;
+                    const imageTag = document.getElementById('asciiImageTag');
+                    const downloadLink = document.getElementById('downloadLink');
+
+                    imageTag.src = data.ascii_image;
+                    downloadLink.href = data.ascii_image;
+                    downloadLink.style.display = 'inline-block';
+                    
+                    results.style.display = 'block';
+                } else {
+                    showError(data.error || 'An error occurred');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+                convertButton.disabled = false;
+            }
+        });
+
+        function switchTab(tabName) {
+            // Убрать активные классы
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Добавить активные классы
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        function copyToClipboard() {
+            const asciiText = document.getElementById('ascii-text').textContent;
+            navigator.clipboard.writeText(asciiText).then(() => {
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
