@@ -47,8 +47,12 @@ def convert():
 
         # Удалим временный файл
         os.remove(upload_path)
+
+        with open("ascii_output.txt", "r", encoding="utf8") as f:
+            data_text = f.read()
+
         return jsonify({
-            "ascii_text": f"ACII output for: {file.filename}, width:{cols}",
+            "ascii_text": f"ACII output for: {file.filename}, width:{cols}\n{data_text}",
             "ascii_image": data_url
         })
         
