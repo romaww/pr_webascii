@@ -2,11 +2,32 @@ services:
   web:
     build: .
     ports:
-      #- "10.66.66.5:3000:5000"
-      - "3000:5000"
+      - "80:80"
     restart: unless-stopped
     environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "prometheus.scrape=true"
+      - "prometheus.port=80"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
     volumes:
-      - ./app:/app
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
