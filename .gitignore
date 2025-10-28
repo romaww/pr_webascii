@@ -1,0 +1,9 @@
+.env
+.env.*
+
+docker-compose.override.yml
+
+grafana-data/
+
+*.log
+*.tmp
