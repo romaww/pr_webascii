@@ -1,16 +1,12 @@
-FROM python:3.9-slim
-
-RUN apt-get update && apt-get install -y \
-    fonts-dejavu-core \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+FROM python:3.12-alpine3.23
 
 WORKDIR /app
 
 COPY app/requirements.txt .
-RUN pip install -r requirements.txt
+RUN apk add --no-cache curl ttf-dejavu \
+    && pip install --no-cache-dir -r requirements.txt
 
 COPY app/. .
-EXPOSE 80
+EXPOSE 5000
 
 CMD ["python3", "main.py"]

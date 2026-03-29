@@ -1,0 +1,52 @@
+name: Lint & deploy
+
+on: [push, pull_request]
+
+env:
+  DOMAIN: wewewewe.ru
+  SERVER_PATH: /home/deploy/app/pr_webascii
+  SERVER_USER: deploy
+  # SERVER_HOST, SERVER_SSH_KEY
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check code
+        uses: actions/actions/checkout@v4
+
+      - name: set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: install flake8
+        run: pip install flake8
+
+      - name: lint with flake8
+        run: flake8 app/ --max-line-length=120
+
+  deploy:
+    needs: lint
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup ssh agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+      - name: Addserver to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+      - name: Deploy with ssh
+        run: |
+          ssh ${{ env.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+          set -e
+          cd ${{ env.SERVER_PATH }}
+          git pull origin master
+          docker compose down
+          docker compose build --no-cache
+          docker compose up -d
+          docker system prune -f #удаление неиспользуемых образов
+          "
