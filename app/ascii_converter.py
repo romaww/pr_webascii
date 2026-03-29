@@ -54,14 +54,14 @@ with open(filename_text, "w", encoding="utf8") as f:
 # Создаем новое изображение для ASCII-арта
 out_w = char_w * cols
 out_h = char_h * rows
-#output_image = Image.new("RGB", (out_w, out_h), color="white")
+# output_image = Image.new("RGB", (out_w, out_h), color="white")
 output_image = Image.new("RGB", (out_w, out_h), color="black")
 draw = ImageDraw.Draw(output_image)
 
 # Рисуем ASCII строки на изображении
 y = 0
 for line in ascii_lines:
-    #draw.text((0, y), line, font=font, fill="black")
+    # draw.text((0, y), line, font=font, fill="black")
     draw.text((0, y), line, font=font, fill="white")
     y += char_h
 

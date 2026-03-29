@@ -15,6 +15,7 @@ REQUEST_LATENCY = Histogram('app_request_latency_seconds', 'Request latency', ['
 CONVERSION_COUNT = Counter('app_conversions_total', 'Total image conversions')
 CONVERSION_ERRORS = Counter('app_conversion_errors_total', 'Total conversion errors')
 
+
 @app.before_request
 def before_request():
     request.start_time = time.time()
@@ -109,5 +110,4 @@ def health():
 if __name__ == '__main__':
     print("Starting Flask app...")
     app.run(host='0.0.0.0', port=80, debug=False)  # debug=False для продакшена
-
 
