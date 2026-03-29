@@ -42,7 +42,7 @@ pixels = img.getdata()
 # Неинвертированные цвета
 chars = [GRAYS[pixel * (n - 1) // 255] for pixel in pixels]
 # Инвертироавнные цвета
-#chars = [GRAYS[(255 - pixel) * (n - 1) // 255] for pixel in pixels]
+# chars = [GRAYS[(255 - pixel) * (n - 1) // 255] for pixel in pixels]
 ascii_lines = ["".join(chars[i:i + cols]) for i in range(0, len(chars), cols)]
 
 # Записываем ascii картинку в текстовый файл

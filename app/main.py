@@ -19,34 +19,37 @@ CONVERSION_ERRORS = Counter('app_conversion_errors_total', 'Total conversion err
 def before_request():
     request.start_time = time.time()
 
+
 @app.after_request
 def after_request(response):
     # Считаем латенси запросов
     latency = time.time() - request.start_time
     REQUEST_LATENCY.labels(request.path).observe(latency)
-    
     # Считаем общее количество запросов
     REQUEST_COUNT.labels(
         method=request.method,
         endpoint=request.path,
         status=response.status_code
     ).inc()
-    
     return response
+
 
 @app.route('/')
 def index():
     print("Serving index page")  # Для отладки
     return render_template('index.html')
 
+
 @app.route('/test')
 def test():
     return jsonify({'status': 'ok', 'message': 'Flask is working!'})
+
 
 @app.route('/metrics')
 def metrics():
     """Эндпоинт для сбора метрик Prometheus"""
     return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
+
 
 @app.route('/convert', methods=['POST'])
 def convert():
@@ -96,11 +99,15 @@ def convert():
         CONVERSION_ERRORS.inc()
         return jsonify({'error': f'Error processing image: {str(e)}'}), 500
 
+
 @app.route('/health')
 def health():
     """Эндпоинт для проверки здоровья приложения"""
     return jsonify({'status': 'healthy', 'timestamp': time.time()})
 
+
 if __name__ == '__main__':
     print("Starting Flask app...")
     app.run(host='0.0.0.0', port=80, debug=False)  # debug=False для продакшена
+
+
